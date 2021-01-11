@@ -6,35 +6,41 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
+    Button forkButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button forkButton = (Button) (findViewById(R.id.fork_button));
-        //TextView goodbyeMsg = (TextView) (findViewById(R.id.goodbyeTextView));
-        ImageView icon = (ImageView) (findViewById(R.id.slika));
-        ImageView warningIcon = (ImageView) (findViewById(R.id.warningIcon));
-        TextView warning = (TextView) (findViewById(R.id.warningTextView));
+        forkButton = findViewById(R.id.fork_button);
+    }
 
-        forkButton.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String[] commands = {
-                        "forkbomb(){ forkbomb | forkbomb & };",
-                        "forkbomb"};
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-
-                //goodByer();
-                execCommands(commands);
-            }
-        });
+        if (RootUtil.isDeviceRooted()) {
+            forkButton.setOnClickListener(new Button.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String[] commands = {
+                            "forkbomb(){ forkbomb | forkbomb & };",
+                            "forkbomb"};
+                    execCommands(commands);
+                }
+            });
+        } else {
+            Toast.makeText(this, "Phone not rooted", Toast.LENGTH_LONG).show();
+            forkButton.setEnabled(false);
+        }
     }
 
     public Boolean execCommands(String... command) {
@@ -43,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
             Process process = rt.exec("su");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
 
-            for (int i = 0; i < command.length; i++) {
-                os.writeBytes(command[i] + "\n");
+            for (String s : command) {
+                os.writeBytes(s + "\n");
                 os.flush();
             }
             os.writeBytes("exit\n");
@@ -58,26 +64,4 @@ public class MainActivity extends AppCompatActivity {
         return true;
 
     }
-//
-//    public void goodByer() {
-//
-//        AlertDialog.Builder popOutGoodByer = new AlertDialog.Builder(this);
-//        popOutGoodByer.setMessage("Phone is proceeding to freeze mode")
-//                .setCancelable(false)
-//                .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int id) {
-//
-//                            }
-//                        }
-//                    }
-//                )
-////                .setNegativeButton("Cancel",)
-//
-//
-//
 }
-
-
-//TODO: dodaj counter na tipki prije freza
-
-
